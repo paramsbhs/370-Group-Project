@@ -6,3 +6,8 @@ CREATE TABLE Sports (
     Department VARCHAR(128)
 );
 SELECT * FROM Sports;
+
+CREATE TABLE User (
+	UserId INT PRIMARY KEY,
+    Username VARCHAR(128)
+);
