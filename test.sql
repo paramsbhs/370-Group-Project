@@ -40,3 +40,8 @@ CREATE TABLE Team (
     Rank VARCHAR(128)
 );
 SELECT * FROM Sports;
+
+CREATE TABLE User (
+	UserId INT PRIMARY KEY,
+    Username VARCHAR(128)
+);
