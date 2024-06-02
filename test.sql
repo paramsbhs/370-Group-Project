@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS TeamLeague(
     FOREIGN KEY (TeamId2) REFERENCES Team(TeamId),
     FOREIGN KEY (LeagueId) REFERENCES League(LeagueId)
 );
-SELECT * FROM Sports;
+-- SELECT * FROM Sports;
 
 INSERT INTO League (Sport, Date, Time, EntryFee, Prizes) VALUES
 ('Soccer', '2024-06-01', '15:00', '$100', 'Trophy'),
@@ -107,7 +107,7 @@ INSERT INTO SportEvent (UserId, Sport, Time, Date) VALUES
 (9, 'Swimming', '13:00', '2024-06-09'),
 (10, 'Volleyball', '12:00', '2024-06-10');
 
-INSERT INTO Team (Sports, MemberCount, Requirements, Rank) VALUES
+INSERT INTO Team (Sports, MemberCount, Requirements, Ranking) VALUES
 ('Soccer', '11', 'Experienced', '1'),
 ('Basketball', '5', 'Professional', '2'),
 ('Tennis', '2', 'Amateur', '3'),
