@@ -48,12 +48,14 @@ CREATE TABLE if NOT EXISTS UserTeam(
     FOREIGN KEY (TeamId) REFERENCES Team(TeamId)
 );
     
-CREATE TABLE if NOT EXISTS TeamLeague(
-	TeamId INT NOT NULL,
-    LeagueID INT NOT NULL,
-	PRIMARY KEY (TeamId, LeagueId),
-    FOREIGN KEY (TeamId) REFERENCES Team(TeamId),
-    FOREIGN KEY (LeagueID) REFERENCES League(LeagueId)
+CREATE TABLE IF NOT EXISTS TeamLeague(
+    TeamId1 INT NOT NULL,
+    TeamId2 INT NOT NULL,
+    LeagueId INT NOT NULL,
+    PRIMARY KEY (TeamId1, TeamId2, LeagueId),
+    FOREIGN KEY (TeamId1) REFERENCES Team(TeamId),
+    FOREIGN KEY (TeamId2) REFERENCES Team(TeamId),
+    FOREIGN KEY (LeagueId) REFERENCES League(LeagueId)
 );
 SELECT * FROM Sports;
 
