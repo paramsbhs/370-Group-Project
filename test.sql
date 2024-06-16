@@ -687,3 +687,41 @@ INSERT INTO TeamLeague (TeamId, LeagueID) VALUES
 (8, 9),
 (9, 10),
 (10, 1);
+
+-- Users not part of a league
+SELECT DISTINCT `UserId`
+From `User`
+Where `UserId` NOT IN (SELECT `UserId` in `UserTeam`)
+
+-- Teams with ranking 1
+SELECT *
+FROM `Team`
+WHERE `Ranking` = (SELECT MIN(`Ranking`) FROM `Team`);
+
+-- Teams for racket sports
+SELECT DISTINCT `TeamId`
+FROM `Team`
+WHERE `Requirements` LIKE '%Racket%';
+
+-- Leagues where entry fee is more than $100
+SELECT DISTINCT `LeagueId`
+From `League`
+WHERE SUBSTRING(EntryFee, 2) > 100;
+
+-- Sports with more than 2 events
+SELECT Sport, COUNT(*) AS EventCount
+FROM SportEvent
+GROUP BY Sport
+HAVING EventCount > 2;
+
+-- Teams with more than 5 members
+SELECT Sports, MemberCount
+FROM Team
+GROUP BY Sports, MemberCount
+HAVING SUM(MemberCount) > 5;
+
+-- Sports with the average ranking less than 3
+SELECT Sports, AVG(Ranking) AS AverageRanking
+FROM Team
+GROUP BY Sports
+HAVING AverageRanking < 3;
