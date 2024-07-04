@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS TeamLeague(
     FOREIGN KEY (LeagueId) REFERENCES League(LeagueId)
 );
 
+
+
 INSERT INTO League (Sport, Date, Time, EntryFee, Prizes) VALUES
 ('Soccer', '2024-06-01', '15:00', '$100', 'Trophy'),
 ('Basketball', '2024-06-02', '16:00', '$150', 'Medal'),
@@ -725,3 +727,72 @@ SELECT Sports, AVG(Ranking) AS AverageRanking
 FROM Team
 GROUP BY Sports
 HAVING AverageRanking < 3;
+
+SELECT * FROM sportsdb.userteam;
+
+
+DROP ROLE IF EXISTS UserManagement;
+CREATE ROLE UserManagement;
+GRANT SELECT, DELETE, UPDATE, INSERT, REFERENCES, TRIGGER ON TABLE user TO UserManagement;
+
+
+DROP ROLE IF EXISTS TeamIntern;
+CREATE ROLE TeamIntern; 
+GRANT SElECT, DELETE, UPDATE, INSERT ON TABLE team TO TeamIntern;
+REVOKE DELETE on TABLE team FROM TeamIntern;
+
+
+
+START Transaction;
+DROP VIEW IF EXISTS sportsdb.UserTeams;
+DROP VIEW IF EXISTS sportsdb.TeamLeagues;
+CREATE VIEW UserTeams AS
+SELECT 
+	U.UserId,
+    U.FirstName,
+    U.LastName,
+    T.TeamName,
+    T.Sports,
+    T.Ranking
+FROM 
+    User U
+    JOIN UserTeam UT ON U.UserId = UT.UserId
+    JOIN Team T ON UT.TeamId = T.TeamId;
+    
+
+    CREATE VIEW TeamLeagues AS
+SELECT 
+    T.TeamName,
+    L.LeagueID,
+    L.Sport,
+    L.Date,
+    L.Time,
+    L.EntryFee,
+    L.Prizes
+FROM 
+    Team T
+    JOIN TeamLeague TL ON T.TeamId = TL.TeamId
+    JOIN League L ON TL.LeagueId = L.LeagueID;
+
+COMMIT;
+
+Select * from UserTeams;
+Select * from TeamLeagues;
+
+
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+START TRANSACTION;
+
+INSERT INTO User (PhoneNumber, Email, FirstName, LastName) VALUES ('1234567890', 'new.user@example.com', 'New', 'User');
+
+COMMIT;
+
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+START TRANSACTION;
+
+SELECT * FROM Team WHERE Sports = 'Soccer';
+
+COMMIT;
+
