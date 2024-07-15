@@ -794,5 +794,70 @@ START TRANSACTION;
 
 SELECT * FROM Team WHERE Sports = 'Soccer';
 
+CREATE TABLE IF NOT EXISTS UndoLog (
+    LogID INT PRIMARY KEY AUTO_INCREMENT,
+    TransactionID INT NOT NULL,
+    Operation VARCHAR(50) NOT NULL,
+    TableName VARCHAR(50) NOT NULL,
+    RowID INT NOT NULL,
+    OldValues TEXT,
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+USE sportsdb;
+CREATE TABLE IF NOT EXISTS RedoLog (
+    LogID INT PRIMARY KEY AUTO_INCREMENT,
+    TransactionID INT NOT NULL,
+    Operation VARCHAR(50) NOT NULL,
+    TableName VARCHAR(50) NOT NULL,
+    RowID INT NOT NULL,
+    NewValues TEXT,
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Checkpoints (
+    CheckpointID INT PRIMARY KEY AUTO_INCREMENT,
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS UserLog (
+    LogID INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT,
+    Operation VARCHAR(50),
+    OperationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES User(UserId)
+);
+
+DELIMITER //
+
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON User
+FOR EACH ROW
+BEGIN
+    INSERT INTO UserLog (UserId, Operation) VALUES (NEW.UserId, 'INSERT');
+END;
+//
+
+DELIMITER ;
+
+START TRANSACTION;
+
+INSERT INTO User (PhoneNumber, Email, FirstName, LastName)
+VALUES ('1234567890', 'new.user@example.com', 'New', 'User');
+
+SET @NewUserId = LAST_INSERT_ID();
+
+INSERT INTO UndoLog (Operation, TableName, RowID, OldValues)
+VALUES ('INSERT', 'User', @NewUserId, NULL);
+
+INSERT INTO RedoLog (Operation, TableName, RowID, NewValues)
+VALUES ('INSERT', 'User', @NewUserId, '{"PhoneNumber": "1234567890", "Email": "new.user@example.com", "FirstName": "New", "LastName": "User"}');
+
+COMMIT;
+ALTER TABLE User
+ADD CONSTRAINT unique_email UNIQUE (Email);
+
+
 COMMIT;
 
