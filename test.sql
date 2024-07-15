@@ -1,13 +1,14 @@
 CREATE DATABASE SportsDB;
 USE SportsDB;
 
-CREATE TABLE if NOT EXISTS League (
-    LeagueID INT PRIMARY KEY AUTO_INCREMENT,
-    Sport VARCHAR(128)NOT NULL,
-    Date VARCHAR(128) NOT NULL,
-    Time VARCHAR(128) NOT NULL,
-    EntryFee VARCHAR(128) NOT NULL,
-    Prizes VARCHAR(128) NOT NULL
+CREATE TABLE IF NOT EXISTS League (
+    LeagueId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Sport VARCHAR(128) NOT NULL,
+    Date DATE NOT NULL,
+    Time TIME NOT NULL,
+    EntryFee DECIMAL(10, 2) NOT NULL CHECK (EntryFee >= 0),
+    Prizes VARCHAR(128) NOT NULL,
+    UNIQUE(Sport, Date, Time) -- Ensuring no two leagues can have the same sport at the same time
 );
 
 CREATE TABLE IF NOT EXISTS Playoffs (
@@ -17,7 +18,8 @@ CREATE TABLE IF NOT EXISTS Playoffs (
     Team2Id INT NOT NULL,
     DateTime DATETIME NOT NULL,
     FOREIGN KEY (Team1Id) REFERENCES Team(TeamId),
-    FOREIGN KEY (Team2Id) REFERENCES Team(TeamId)
+    FOREIGN KEY (Team2Id) REFERENCES Team(TeamId),
+    CHECK (Team1Id != Team2Id) -- A team cannot play against itself
 );
 
 CREATE TABLE if NOT EXISTS User (
@@ -28,23 +30,24 @@ CREATE TABLE if NOT EXISTS User (
     LastName VARCHAR(128) NOT NULL
 );
 
-CREATE TABLE if NOT EXISTS SportEvent (
+CREATE TABLE IF NOT EXISTS SportEvent (
     EventId INT PRIMARY KEY AUTO_INCREMENT,
-    UserId VARCHAR(128) NOT NULL,
+    UserId INT NOT NULL,
     Sport VARCHAR(128) NOT NULL,
-    Time VARCHAR(128) NOT NULL,
-    Date VARCHAR(128) NOT NULL
+    Time TIME NOT NULL,
+    Date DATE NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES User(UserId),
+    UNIQUE(UserId, Sport, Date, Time) -- Ensuring a user cannot create multiple events for the same sport at the same time
 );
 
-CREATE TABLE if NOT EXISTS Team (
+CREATE TABLE IF NOT EXISTS Team (
     TeamId INT PRIMARY KEY AUTO_INCREMENT,
     Sports VARCHAR(128) NOT NULL,
-    MemberCount VARCHAR(128) NOT NULL,
+    MemberCount INT NOT NULL CHECK (MemberCount >= 1),
     Requirements VARCHAR(128) NOT NULL,
-    Ranking VARCHAR(128) NOT NULL,
-    TeamName VARCHAR(128) NOT NULL
+    Ranking INT NOT NULL CHECK (Ranking >= 1 AND Ranking <= 100), -- Assuming ranking is between 1 and 100
+    TeamName VARCHAR(128) NOT NULL UNIQUE
 );
-ALTER TABLE Team ADD COLUMN TeamName VARCHAR(128) NOT NULL;
 
 
 CREATE TABLE if NOT EXISTS UserTeam(
